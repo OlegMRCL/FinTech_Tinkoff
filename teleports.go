@@ -23,12 +23,11 @@ func (p path) isVisited (direct int) bool {
 	return false
 }
 
-func (p path) addPoint (direct int, d *data) (newPath path) {
-	newPath = p
-	newPath.here = direct
-	newPath.time += d.stations[direct].service
-	newPath.route = append (newPath.route, direct)
-	return
+func (p path) addPoint (direct int, d *data) (path) {
+	p.here = direct
+	p.time += d.stations[direct].service
+	p.route = append (p.route, direct)
+	return p
 }
 
 
@@ -114,7 +113,6 @@ func main() {
 		p = d.stations[b-1]
 		p.teleport = append (p.teleport, a-1)
 	}
-
 
 
 	d.calculate(N)
