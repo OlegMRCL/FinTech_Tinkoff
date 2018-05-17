@@ -12,11 +12,11 @@ func inHead (x,y float64) bool {
 }
 
 func belowBrows (x,y float64) bool {
-	return (0.5 * math.Abs(x) + 0.5) < y
+	return (0.5 * math.Abs(x) + 0.5) > y
 }
 
 func outOfEyes (x,y float64) bool {
-	return (math.Pow((x - 0.5), 2) + math.Pow(y, 2)) > 0.3
+	return ((math.Pow((x - 0.5), 2) + math.Pow(y, 2)) > 0.3)&&((math.Pow((x + 0.5), 2) + math.Pow(y, 2)) > 0.3)
 }
 
 func success (x,y float64) bool {
@@ -27,8 +27,12 @@ func main () {
 	var x,y float64
 	fmt.Fscan(os.Stdin, &x, &y)
 
+
+
 	if success(x,y) {
 		fmt.Println("YES")
-	}else{fmt.Println("NO")}
+	}else{
+		fmt.Println("NO")
+		}
 
 }
