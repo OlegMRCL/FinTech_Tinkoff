@@ -46,7 +46,7 @@ type data struct {
 	wg sync.WaitGroup
 }
 
-func (d data) jump (p path, ch chan int) {
+func (d *data) jump (p path, ch chan int) {
 	defer d.wg.Done()
 	if p.here == 0 {
 		ch <- p.time
@@ -54,7 +54,7 @@ func (d data) jump (p path, ch chan int) {
 		s := d.stations[p.here]
 		for _,direct := range s.teleport {
 			if !p.isVisited(direct) {
-				newPath := p.addPoint (direct, &d)
+				newPath := p.addPoint (direct, d)
 				if (newPath.time < d.minTime)||(d.minTime == 0){
 					d.wg.Add(1)
 					go d.jump(newPath, ch)
@@ -64,7 +64,7 @@ func (d data) jump (p path, ch chan int) {
 	}
 }
 
-func(d data) finish (ch chan int) {
+func(d *data) finish (ch chan int) {
 	for time := range ch {
 		if (time < d.minTime) || (d.minTime == 0) {
 			d.minTime = time
@@ -72,8 +72,7 @@ func(d data) finish (ch chan int) {
 	}
 }
 
-/*
-func (d data) calculate(N int) {
+func (d *data) calculate(N int) {
 	ch := make (chan int, 1)
 
 	var newPath path
@@ -87,7 +86,6 @@ func (d data) calculate(N int) {
 
 	fmt.Println(d.minTime-d.stations[0].service)
 }
-*/
 
 
 
@@ -117,18 +115,9 @@ func main() {
 		p.teleport = append (p.teleport, a-1)
 	}
 
-	/*calculate(N)*/
-	ch := make (chan int, 1)
 
-	var newPath path
-	newPath = newPath.addPoint(N-1, d)
-	d.wg.Add(1)
-	go d.jump(newPath, ch)
 
-	go d.finish(ch)
-	d.wg.Wait()
-	close(ch)
+	d.calculate(N)
 
-	fmt.Println(d.minTime-d.stations[0].service)
 
 }
