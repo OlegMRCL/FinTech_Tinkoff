@@ -9,11 +9,13 @@ import (
 
 
 type path struct {
-	time int
-	route []int
-	here int
+	time int			//время в пути
+	route []int			//маршрут - список посещенных точек
+	here int			//точка, в которой мы находимся в данный момент
 }
 
+
+//Метод проверяет посещался ли уже нами пункт direct
 func (p path) isVisited (direct int) bool {
 	for _,visited := range p.route {
 		if direct == visited {
@@ -23,6 +25,10 @@ func (p path) isVisited (direct int) bool {
 	return false
 }
 
+
+//Метод добавляет точку в маршрут,
+// обозначет эту точку как нынешнюю
+// и добавляет к времени пути время обслуживания в этой точке
 func (p path) addPoint (direct int, d *data) (path) {
 	p.here = direct
 	p.time += d.stations[direct].service
@@ -34,17 +40,24 @@ func (p path) addPoint (direct int, d *data) (path) {
 
 
 type point struct {
-	service int
-	teleport []int
+	service int			//время обслуживания в данной точке
+	teleport []int		//список точек, в которые можно телепортироваться из данной точки
 }
 
 
 type data struct {
-	stations [] *point
-	minTime int
+	stations [] *point		//список точек
+	minTime int				//минимальное время уже известных маршрутов
 	wg sync.WaitGroup
 }
 
+
+//Функция определяет нужно ли идти дальше или мы уже прибыли в пункт назначения,
+// и в соответствии с этим либо отправляет в канал время пути,
+// либо продолжает путь.
+//
+//(Оптимизирована тем, что путь не продолжается в точки, где мы уже были ранее,
+// а также путь не продолжается, если время в пути уже стало больше наименьшего из известных)
 func (d *data) jump (p path, ch chan int) {
 	defer d.wg.Done()
 	if p.here == 0 {
@@ -63,6 +76,7 @@ func (d *data) jump (p path, ch chan int) {
 	}
 }
 
+//Определяет наименьшее время маршрутов "на финише"
 func(d *data) finish (ch chan int) {
 	for time := range ch {
 		if (time < d.minTime) || (d.minTime == 0) {
@@ -83,12 +97,13 @@ func (d *data) calculate(N int) {
 	d.wg.Wait()
 	close(ch)
 
-	fmt.Println(d.minTime-d.stations[0].service)
+	if d.minTime != 0 {
+		fmt.Println(d.minTime - d.stations[N-1].service)
+	}else{
+		fmt.Println(-1)
+	}
+
 }
-
-
-
-
 
 
 
