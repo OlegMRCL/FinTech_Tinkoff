@@ -32,7 +32,7 @@ func main() {
 	}
 	sub := data[first+1:last]
 
-	for i := 0; i <= len(sub) / 2; i++ {
+	for i := 0; i < len(sub)/2; i++ {
 		j:=len(sub)-i-1
 		sub[i], sub[j] = sub[j], sub[i]
 	}
